@@ -1,0 +1,29 @@
+<.header>
+  Diary <%= @diary.id %>
+  <:subtitle>This is a diary record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/diaries/#{@diary}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit diary</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title"><%= @diary.title %></:item>
+  <:item title="Text"><%= @diary.text %></:item>
+  <:item title="Date"><%= @diary.date %></:item>
+  <:item title="Cat"><%= @diary.cat %></:item>
+</.list>
+
+<.back navigate={~p"/diaries"}>Back to diaries</.back>
+
+<.modal :if={@live_action == :edit} id="diary-modal" show on_cancel={JS.patch(~p"/diaries/#{@diary}")}>
+  <.live_component
+    module={CatDiaryPocWeb.DiaryLive.FormComponent}
+    id={@diary.id}
+    title={@page_title}
+    action={@live_action}
+    diary={@diary}
+    patch={~p"/diaries/#{@diary}"}
+  />
+</.modal>

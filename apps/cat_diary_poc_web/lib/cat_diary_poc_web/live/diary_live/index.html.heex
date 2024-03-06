@@ -1,0 +1,44 @@
+<.header>
+  Listing Diaries
+  <:actions>
+    <.link patch={~p"/diaries/new"}>
+      <.button>New Diary</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="diaries"
+  rows={@streams.diaries}
+  row_click={fn {_id, diary} -> JS.navigate(~p"/diaries/#{diary}") end}
+>
+  <:col :let={{_id, diary}} label="Title"><%= diary.title %></:col>
+  <:col :let={{_id, diary}} label="Text"><%= diary.text %></:col>
+  <:col :let={{_id, diary}} label="Date"><%= diary.date %></:col>
+  <:col :let={{_id, diary}} label="Cat"><%= diary.cat %></:col>
+  <:action :let={{_id, diary}}>
+    <div class="sr-only">
+      <.link navigate={~p"/diaries/#{diary}"}>Show</.link>
+    </div>
+    <.link patch={~p"/diaries/#{diary}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, diary}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: diary.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="diary-modal" show on_cancel={JS.patch(~p"/diaries")}>
+  <.live_component
+    module={CatDiaryPocWeb.DiaryLive.FormComponent}
+    id={@diary.id || :new}
+    title={@page_title}
+    action={@live_action}
+    diary={@diary}
+    patch={~p"/diaries"}
+  />
+</.modal>

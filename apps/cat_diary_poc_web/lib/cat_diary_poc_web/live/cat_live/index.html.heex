@@ -1,0 +1,43 @@
+<.header>
+  Listing Cats
+  <:actions>
+    <.link patch={~p"/cats/new"}>
+      <.button>New Cat</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="cats"
+  rows={@streams.cats}
+  row_click={fn {_id, cat} -> JS.navigate(~p"/cats/#{cat}") end}
+>
+  <:col :let={{_id, cat}} label="Name"><%= cat.name %></:col>
+  <:col :let={{_id, cat}} label="Birth date"><%= cat.birth_date %></:col>
+  <:col :let={{_id, cat}} label="Description"><%= cat.description %></:col>
+  <:action :let={{_id, cat}}>
+    <div class="sr-only">
+      <.link navigate={~p"/cats/#{cat}"}>Show</.link>
+    </div>
+    <.link patch={~p"/cats/#{cat}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, cat}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: cat.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="cat-modal" show on_cancel={JS.patch(~p"/cats")}>
+  <.live_component
+    module={CatDiaryPocWeb.CatLive.FormComponent}
+    id={@cat.id || :new}
+    title={@page_title}
+    action={@live_action}
+    cat={@cat}
+    patch={~p"/cats"}
+  />
+</.modal>
